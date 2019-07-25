@@ -1,24 +1,33 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Projeto criado para o [desafio da PetLove](CHALLENGE.md)
 
-Things you may want to cover:
+## Considerações
 
-* Ruby version
+Criei a entidade suporte PetKind para associar os animais a uma entidade inves de uma string. Foi considerado usar Enum, mas como o desafio era muito focado em queries, decidi por uma nova entidade.
 
-* System dependencies
+## Testes
 
-* Configuration
+Foram adicionados testes apenas para a model Person por entender que era a unica entidade com regras de negocio.
 
-* Database creation
+## Questões
 
-* Database initialization
+### Qual é o custo médio dos animais do tipo cachorro?
 
-* How to run the test suite
+    Pet.joins(:pet_kind).where(pet_kinds: {name: 'cachorro'}).average(:monthly_cost).to_f
 
-* Services (job queues, cache servers, search engines, etc.)
+### Quantos cachorros existem no sistema?
 
-* Deployment instructions
+    Pet.joins(:pet_kind).where(pet_kinds: {name: 'cachorro'}).count
 
-* ...
+### Qual o nome dos donos dos cachorros (Array de nomes)
+
+    Person.joins(pets: :pet_kind).where(pet_kinds: {name: 'cachorro'}).pluck(:name)
+
+### Retorne as pessoas ordenando pelo custo que elas tem com os animais (Maior para menor)
+
+    Person.joins(:pets).group(:name).order('sum_monthly_cost desc').sum(:monthly_cost)
+
+### Levando em consideração o custo mensal, qual será o custo de 3 meses de cada pessoa?
+
+    Person.joins(:pets).group(:name).sum("3 * monthly_cost")
