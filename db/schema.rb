@@ -32,7 +32,6 @@ ActiveRecord::Schema.define(version: 2019_07_25_163211) do
   create_table "pets", force: :cascade do |t|
     t.string "name"
     t.float "monthly_cost"
-    t.integer "kind"
     t.bigint "owner_id"
     t.bigint "pet_kind_id"
     t.datetime "created_at", null: false
