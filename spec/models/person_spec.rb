@@ -5,7 +5,7 @@ RSpec.describe Person, :type => :model do
     person = create(:person)
     person.pets << build_list(:pet, 2, owner: nil)
 
-    expect(person.valid?)
+    expect(person.valid?).to be_truthy
     expect(person.pets.count).to be 2
   end
 
@@ -20,7 +20,7 @@ RSpec.describe Person, :type => :model do
 
     expect(young.valid?).to be_falsey
     expect(young.errors.messages[:pets]).to eq ['Person under 18 cannot have swallows']
-    expect(adult.valid?)
+    expect(adult.valid?).to be_truthy
   end
 
   it "People must not have initial latter A to have cats" do
@@ -34,7 +34,7 @@ RSpec.describe Person, :type => :model do
 
     expect(a_name.valid?).to be_falsey
     expect(a_name.errors.messages[:pets]).to eq ['Person with initial latter A cannot have cats']
-    expect(not_a_name.valid?)
+    expect(not_a_name.valid?).to be_truthy
   end
 
   it "People cannot expend monthly more than 1000 with pets" do
@@ -44,8 +44,65 @@ RSpec.describe Person, :type => :model do
     person_under_limit.pets << build_list(:pet, 2, monthly_cost: 500.0)
     person_above_limit.pets << build_list(:pet, 2, monthly_cost: 501.0)
 
-    expect(person_under_limit.valid?)
+    expect(person_under_limit.valid?).to be_truthy
     expect(person_above_limit.valid?).to be_falsey
     expect(person_above_limit.errors.messages[:pets]).to eq ['Monthly cost with pets above limit']
+  end
+
+  describe "#have_pet_kind?" do
+    let(:person) { create(:person) }
+
+    context "when pet kind with name paramater exists" do
+      let(:pet_kind) { create(:pet_kind) }
+
+      context "when person has pet with kind" do
+        it "returns true" do
+          create(:pet, owner: person, pet_kind: pet_kind)
+          person.reload
+
+          expect(person.have_pet_kind?(pet_kind.name)).to be_truthy
+        end
+      end
+
+      context "when person has not pet with kind" do
+        it "returns false" do
+          expect(person.have_pet_kind?(pet_kind.name)).to be_falsey
+        end
+      end
+    end
+
+    context "when pet king with name paramater does not exsts" do
+      it "returns false" do
+        expect(person.have_pet_kind?("inexistent")).to be_falsey
+      end
+    end
+  end
+
+  describe "#age" do
+    it "returns person's age" do
+      one_year_person = create(:person, birthdate: Date.today - 2.year + 1.month)
+      two_year_person = create(:person, birthdate: Date.today - 2.year - 1.month)
+
+      expect(one_year_person.age).to eq 1
+      expect(two_year_person.age).to eq 2
+    end
+  end
+
+  describe "#pets_cost" do
+    let(:person) { create(:person) }
+
+    context "when person hasnt pets" do
+      it "returns 0" do
+        expect(person.pets_cost).to eq 0
+      end
+    end
+
+    context "when person has pets" do
+      it "returns sum of pets monthly_cost" do
+        person.pets << create_list(:pet, 2, monthly_cost: 10)
+
+        expect(person.pets_cost).to eq 20
+      end
+    end
   end
 end
