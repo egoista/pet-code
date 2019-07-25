@@ -49,7 +49,7 @@ RSpec.describe Person, :type => :model do
     expect(person_above_limit.errors.messages[:pets]).to eq ['Monthly cost with pets above limit']
   end
 
-  describe "#have_pet_kind?" do
+  describe "#has_pet_kind?" do
     let(:person) { create(:person) }
 
     context "when pet kind with name paramater exists" do
@@ -60,20 +60,20 @@ RSpec.describe Person, :type => :model do
           create(:pet, owner: person, pet_kind: pet_kind)
           person.reload
 
-          expect(person.have_pet_kind?(pet_kind.name)).to be_truthy
+          expect(person.has_pet_kind?(pet_kind.name)).to be_truthy
         end
       end
 
       context "when person has not pet with kind" do
         it "returns false" do
-          expect(person.have_pet_kind?(pet_kind.name)).to be_falsey
+          expect(person.has_pet_kind?(pet_kind.name)).to be_falsey
         end
       end
     end
 
     context "when pet king with name paramater does not exsts" do
       it "returns false" do
-        expect(person.have_pet_kind?("inexistent")).to be_falsey
+        expect(person.has_pet_kind?("inexistent")).to be_falsey
       end
     end
   end

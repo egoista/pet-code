@@ -5,7 +5,7 @@ class Person < ApplicationRecord
   validate :initial_letter_restriction_for_cat
   validate :cost_limit
 
-  def have_pet_kind?(pet_kind_name)
+  def has_pet_kind?(pet_kind_name)
     pet_kind_id = PetKind.where(name: pet_kind_name).pluck(:id).first
     
     if pet_kind_id
@@ -27,13 +27,13 @@ class Person < ApplicationRecord
   private
 
   def age_restriction_for_swallow
-    if have_pet_kind?('andorinha') && age < 18
+    if has_pet_kind?('andorinha') && age < 18
       errors.add(:pets, 'Person under 18 cannot have swallows')
     end
   end
 
   def initial_letter_restriction_for_cat
-    if name[0] == 'A' && have_pet_kind?('gato')
+    if name[0] == 'A' && has_pet_kind?('gato')
       errors.add(:pets, 'Person with initial latter A cannot have cats')
     end
   end
